@@ -18,7 +18,6 @@ export default function LandingPage() {
           </Link>
         </motion.div>
       </header>
-
       <main className="flex-grow flex items-center justify-center px-4 relative z-10">
         <div className="text-center">
           <motion.h1
@@ -38,15 +37,15 @@ export default function LandingPage() {
           >
             <TypeAnimation
               sequence={[
-                "Find new friends 🤝😊 ",
+                "Find new friends ",
                 2000,
-                "Find your date ❤️",
+                "Find your date",
                 2000,
-                "Your date is just a click away 💘",
+                "Your date is just a click away",
                 2000,
-                "Discover new connections ✨",
+                "Discover new connections",
                 2000,
-                "Explore your campus 🏫",
+                "Explore your campus",
                 2000,
               ]}
               wrapper="span"

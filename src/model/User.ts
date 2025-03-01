@@ -14,6 +14,7 @@ const UserSchema = new mongoose.Schema({
     lookingFor: { type: String, enum: ['long-term', 'short-term', 'friendship'], required: true },
     smoker: { type: String, enum: ['yes', 'no'], required: true },
     drinker: { type: String, enum: ['yes', 'no'], required: true },
+    relationshipStatus: { type: String, enum: ['single', 'other'], default:"single" , required: true },
     communicationPreference: { type: String, enum: ['calling', 'messaging'], required: true },
     hobby:{type:String,required:true},
     photos: [{ type: String }]

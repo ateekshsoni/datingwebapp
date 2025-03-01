@@ -34,6 +34,7 @@ const profileSchema = z.object({
   lookingFor: z.enum(["long-term", "short-term", "friendship"]),
   smoker: z.enum(["yes", "no"]),
   drinker: z.enum(["yes", "no"]),
+  relationshipStatus: z.enum(["single", "other"]),
   communicationPreference: z.enum(["calling", "messaging"]),
   photos: z.array(z.string()),
   gender: z.enum(["male", "female", "other"]),
@@ -41,46 +42,62 @@ const profileSchema = z.object({
     .min(2, { message: "Hobby is required." })
     .max(15, { message: "Hobby must be at most 15 characters." })
     .regex(/^\w+$/, { message: "Hobby must be a single word." }),
-
 })
 const courses = [
-  "BCA",
   "BBA",
-  "BCOM",
-  "Btech",
-  "agriculture",
-  "BALLB",
-  "BCOMLLB",
-  "MCA",
   "MBA",
-  "MCOM",
-  "Mtech",
-  "MALLB",
-  "MCOMLLB",
+  "BCA",
+  "MCA",
+  "LLB",
+  "BPT",
+  "B.Sc",
+  "B.Tech",
+  "B.Com",
+  "M.Sc",
+  "B.A",
+  "GNM",
+  "LLM",
+  "PGDM",
+  "BJMC",
+  "M.Lib.Sc",
   "Other",
 ]
 const colleges = [
   "renaissnace university",
-  "SVVV",
-  "medicaps university",
-  "Malwa Institute of Technology",
-  "prestige university",
+]
+const hobbies = [
+  "Dancing",
+  "Singing",
+  "Photography",
+  "Chess",
+  "Cooking",
+  "Cricket",
+  "Kadabbi",
+  "Sketching",
+  "Painting",
+  "Football",
+  "Badmintion",
+  "Traveling",
+  "Enterprenerenceship",
+  "Reading",
+  "Writing",
+  "Gaming",
   "Other",
 ]
 
-const religions = ["hinduism", "islam", "jainism", "christianity", "sikhism", "buddhism", "Atheist", "other"]
+const religions = ["hindu", "islam", "Jain", "Christian", "Sikh", "Buddh", "Atheist", "other"]
+
 
 export default function ProfileCompletion() {
   const router = useRouter()
   const [photosurl, setPhotosUrl1] = useState<string[]>([])
-  const [interests, setInterests] = useState<string[]>([])
-  const [newInterest, setNewInterest] = useState("")
   const { data: session, status } = useSession()
   const [disabledButton, setDisabledButton] = useState<boolean>(false)
+  const [showCustomHobby, setShowCustomHobby] = useState<boolean>(false)
+  const [customHobby, setCustomHobby] = useState<string>("")
 
   const addItem = (newUrl: string) => {
     if (photosurl.length < 3 && newUrl) {
-      setPhotosUrl1((prevItems) => [...prevItems, newUrl])
     } else if (photosurl.length >= 3) {
       toast({
         title: "Limit reached",
@@ -104,12 +121,33 @@ export default function ProfileCompletion() {
       lookingFor: "long-term",
       smoker: "no",
       drinker: "no",
+      relationshipStatus: "single",
       communicationPreference: "messaging",
       photos: [],
       gender: "male",
       hobby: "",
     },
   })
+  
+  // Handle hobby selection change
+  const handleHobbyChange = (value: string) => {
+    if (value === "Other") {
+      setShowCustomHobby(true)
+      // Clear the hobby field when selecting "Other"
+      form.setValue("hobby", "")
+    } else {
+      setShowCustomHobby(false)
+      form.setValue("hobby", value)
+    }
+  }
+
+  // Handle custom hobby input change
+  const handleCustomHobbyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setCustomHobby(value)
+    form.setValue("hobby", value)
+  }
+  
   async function onSubmit(values: z.infer<typeof profileSchema>) {
     setDisabledButton(true)
     try {
@@ -145,7 +183,6 @@ export default function ProfileCompletion() {
       })
       form.reset()
       setPhotosUrl1([])
-      setInterests([])
       router.push("/home")
     } catch (error) {
       toast({
@@ -156,7 +193,6 @@ export default function ProfileCompletion() {
     }
     setDisabledButton(false)
   }
-
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -215,19 +251,47 @@ export default function ProfileCompletion() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="hobby"
-            render={({ field }) => (
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="hobby"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hobby</FormLabel>
+                  <Select onValueChange={handleHobbyChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your hobby" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {hobbies.map((hobby) => (
+                        <SelectItem key={hobby} value={hobby}>
+                          {hobby}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {showCustomHobby && (
               <FormItem>
-                <FormLabel>Hobby</FormLabel>
+                <FormLabel>Custom Hobby</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your hobby" {...field} />
+                  <Input 
+                    placeholder="Enter your hobby" 
+                    value={customHobby} 
+                    onChange={handleCustomHobbyChange} 
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormDescription>Enter a single word (max 15 characters)</FormDescription>
+                <FormMessage>{form.formState.errors.hobby?.message}</FormMessage>
               </FormItem>
             )}
-          />
+          </div>
           <FormField
             control={form.control}
             name="age"
@@ -459,6 +523,36 @@ export default function ProfileCompletion() {
           />
           <FormField
             control={form.control}
+            name="relationshipStatus"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>Relationship Status</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-1"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="single" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Single</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="other" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Other</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="communicationPreference"
             render={({ field }) => (
               <FormItem>
@@ -529,4 +623,3 @@ export default function ProfileCompletion() {
     </div>
   )
 }
-

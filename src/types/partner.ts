@@ -12,6 +12,7 @@ export interface Partner {
     lookingFor: 'long-term' | 'short-term' | 'friendship'
     smoker: 'yes' | 'no'
     drinker: 'yes' | 'no'
+    relationshipStatus: 'single' | 'other'
     communicationPreference: 'calling' | 'messaging'
     photos: string[]
     hobby:string

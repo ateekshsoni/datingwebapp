@@ -45,25 +45,28 @@ const profileSchema = z.object({
   lookingFor: z.enum(["long-term", "short-term", "friendship"]),
   smoker: z.enum(["yes", "no"]),
   drinker: z.enum(["yes", "no"]),
+  relationshipStatus: z.enum(["single", "other"]),
   communicationPreference: z.enum(["calling", "messaging"]),
   photos: z.array(z.string()),
-  interests: z.array(z.string()),
 })
 
 const courses = [
-  "BCA",
   "BBA",
-  "BCOM",
-  "Btech",
-  "agriculture",
-  "BALLB",
-  "BCOMLLB",
-  "MCA",
   "MBA",
-  "MCOM",
-  "Mtech",
-  "MALLB",
-  "MCOMLLB",
+  "BCA",
+  "MCA",
+  "LLB",
+  "BPT",
+  "B.Sc",
+  "B.Tech",
+  "B.Com",
+  "M.Sc",
+  "B.A",
+  "GNM",
+  "LLM",
+  "PGDM",
+  "BJMC",
+  "M.Lib.Sc",
   "Other",
 ]
 
@@ -76,7 +79,27 @@ const colleges = [
   "Other",
 ]
 
-const religions = ["hinduism", "islam", "jainism", "christianity", "sikhism", "buddhism", "Atheist", "other"]
+const hobbies = [
+  "Dancing",
+  "Singing",
+  "Photography",
+  "Chess",
+  "Cooking",
+  "Cricket",
+  "Kadabbi",
+  "Sketching",
+  "Painting",
+  "Football",
+  "Badmintion",
+  "Traveling",
+  "Enterprenerenceship",
+  "Reading",
+  "Writing",
+  "Gaming",
+  "Other",
+]
+
+const religions = ["hindu", "islam", "Jain", "Christian", "Sikh", "Buddh", "Atheist", "other"]
 
 export default function UpdateProfile() {
   const router = useRouter()
@@ -105,9 +128,9 @@ export default function UpdateProfile() {
       lookingFor: "long-term",
       smoker: "no",
       drinker: "no",
+      relationshipStatus: "single",
       communicationPreference: "messaging",
       photos: [],
-      interests: [],
     },
   })
 
@@ -143,9 +166,9 @@ export default function UpdateProfile() {
             lookingFor: user.lookingFor || "long-term",
             smoker: user.smoker || "no",
             drinker: user.drinker || "no",
+            relationshipStatus: user.relationshipStatus || "single",
             communicationPreference: user.communicationPreference || "messaging",
             photos: user.photos || [],
-            interests: user.interests || [],
           })
           setPhotosUrl(user.photos || [])
           setInterests(user.interests || [])
@@ -186,7 +209,6 @@ export default function UpdateProfile() {
     try {
       // Use newPhotosUrl if it's not empty, otherwise use the existing photosUrl
       values.photos = newPhotosUrl.length > 0 ? newPhotosUrl : photosUrl
-      values.interests = interests
       const response = await fetch("/api/users", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -210,19 +232,6 @@ export default function UpdateProfile() {
     setDisabledButton(false)
   }
 
-  const addInterest = () => {
-    if (newInterest && !interests.includes(newInterest)) {
-      setInterests([...interests, newInterest])
-      form.setValue("interests", [...interests, newInterest])
-      setNewInterest("")
-    }
-  }
-
-  const removeInterest = (interest: string) => {
-    const updatedInterests = interests.filter((i) => i !== interest)
-    setInterests(updatedInterests)
-    form.setValue("interests", updatedInterests)
-  }
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -301,9 +310,20 @@ export default function UpdateProfile() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Hobby</FormLabel>
-                <FormControl>
-                  <Input placeholder="Your hobby" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your hobby" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {hobbies.map((hobby) => (
+                      <SelectItem key={hobby} value={hobby}>
+                        {hobby}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -539,6 +559,36 @@ export default function UpdateProfile() {
           />
           <FormField
             control={form.control}
+            name="relationshipStatus"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel>Relationship Status</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-1"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="single" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Single</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="other" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Other</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="communicationPreference"
             render={({ field }) => (
               <FormItem className="space-y-3">
@@ -643,4 +693,3 @@ export default function UpdateProfile() {
     </div>
   )
 }
-

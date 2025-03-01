@@ -277,6 +277,10 @@ export default function PartnerCard({
                   <h4 className="font-semibold mb-2">Drinker</h4>
                   <Badge variant={"secondary"}>{partner.drinker}</Badge>
                 </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Relationship Status</h4>
+                  <Badge variant={"secondary"}>{partner.relationshipStatus || "single"}</Badge>
+                </div>
               </div>
             </div>
           </div>
@@ -376,4 +380,3 @@ export default function PartnerCard({
     </>
   )
 }
-
